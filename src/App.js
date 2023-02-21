@@ -1,16 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import ErrorNotification from './components/ErrorNotification'
 import Notification from './components/Notification'
+import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './index.css'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [username, setUsername] = useState('')
@@ -59,26 +58,17 @@ const App = () => {
     setUser(null)
   }
 
-  const addBlog = (event) => {
-    event.preventDefault()
-    const blogObject = {
-      title : newTitle,
-      author: newAuthor,
-      url: newUrl,
-    }
-
+  const addBlog = (blogObject) => {
+    blogFormRef.current.toggleVisibility()  //form disappears when a new blog is added
     blogService
       .create(blogObject)
-        .then(returnedBlog => {
-          setBlogs(blogs.concat(returnedBlog))
-          setNewTitle('')
-          setNewAuthor('')
-          setNewUrl('')
-          setNotificationMessage(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`)
-          setTimeout(() => {
-            setNotificationMessage(null)
-          }, 5000)
-        })
+      .then(returnedBlog => {
+        setBlogs(blogs.concat(returnedBlog))
+        setNotificationMessage(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`)
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 5000)
+      })
   }
 
   const loginForm = () => (
@@ -100,24 +90,8 @@ const App = () => {
       </div>
   )
 
-  const blogForm = () => (
-    <div>
-        <h2>Blogs</h2>
-        <h3>Create new</h3>
-        <form onSubmit={addBlog}>
-          Title:
-            <input value={newTitle} onChange={({ target }) => setNewTitle(target.value)} /><br></br>
-          Author:
-            <input value={newAuthor} onChange={({ target }) => setNewAuthor(target.value)} /><br></br>
-          Url:
-            <input value={newUrl} onChange={({ target }) => setNewUrl(target.value)} /><br></br>
-          <button type='submit'>Create</button>
-        </form>
-        {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
-        )}
-      </div>
-  )
+  // A reference to the component Togglable to access its "ToggleVisibility"
+  const blogFormRef = useRef()
 
   return (
     <div>
@@ -131,7 +105,12 @@ const App = () => {
           <button type='submit' style={{'marginLeft': 8}}>Logout</button>
           </p>
         </form>
-        {blogForm()}
+        <Togglable buttonLabel="Create new" ref={blogFormRef}>
+          <BlogForm createBlog={addBlog} />
+        </Togglable>
+        {blogs.map(blog =>
+          <Blog key={blog.id} blog={blog} />
+        )}
       </div>
       }
     </div>
