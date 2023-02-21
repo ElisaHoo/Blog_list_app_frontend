@@ -1,5 +1,4 @@
-import { useState, useRef } from "react"
-import Togglable from "./Togglable"
+import { useState } from "react"
 
 const BlogForm = ({ createBlog }) => {
     const [newTitle, setNewTitle] = useState('')
@@ -16,7 +15,6 @@ const BlogForm = ({ createBlog }) => {
         setNewTitle('')
         setNewAuthor('')
         setNewUrl('')
-
     }
 
     return (
