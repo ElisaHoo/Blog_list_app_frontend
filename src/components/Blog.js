@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const Blog = ({blog}) => {
+const Blog = ({blog, user}) => {
   const [visible, setVisible] = useState(false)
 
   const hideWhenVisible = { display: visible ? 'none' : '' }
@@ -25,7 +25,7 @@ const Blog = ({blog}) => {
         <div>{blog.title},{ }{blog.author}{ }<button onClick={toggleVisibility}>Hide</button></div>
         <div>{blog.url}</div>
         <div>likes {blog.likes}<button>Likes</button></div>
-        <div>A user who added: {blog.user.name}</div>
+        <div>Created on the list: {user.name}</div>
       </div>  
     )
   } else {
