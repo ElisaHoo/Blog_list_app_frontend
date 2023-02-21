@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import ErrorNotification from './components/ErrorNotification'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import './index.css'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [notificationMessage, setNotificationMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -22,7 +25,7 @@ const App = () => {
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-    if (loggedUserJSON) {  // Appllication checks if the information of the logged-in user can be found in the local storage
+    if (loggedUserJSON) {  // Application checks if the information of the logged-in user can be found in the local storage
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       blogService.setToken(user.token)
@@ -43,7 +46,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('Wrong credentials')
+      setErrorMessage('Wrong username or password')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -71,6 +74,10 @@ const App = () => {
           setNewTitle('')
           setNewAuthor('')
           setNewUrl('')
+          setNotificationMessage(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`)
+          setTimeout(() => {
+            setNotificationMessage(null)
+          }, 5000)
         })
   }
 
@@ -114,7 +121,8 @@ const App = () => {
 
   return (
     <div>
-      { <Notification message={errorMessage} /> }
+      { <ErrorNotification message={errorMessage} /> }
+      { <Notification message={notificationMessage} /> }
 
       {!user && loginForm()}  {/* if user is not defined blogForm is not displayed */}
       {user && <div>
