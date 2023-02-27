@@ -95,7 +95,8 @@ const App = () => {
 
   const updateLikes = async (blogId, updatedBlog) => {
     await blogService.likes(blogId, updatedBlog)
-    await blogService.getAll().then(blogs => setBlogs(blogs))
+    const blogs = await blogService.getAll()
+    setBlogs(blogs)
   }
 
   return (
@@ -113,7 +114,9 @@ const App = () => {
         <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
           <BlogForm createBlog={addBlog}/>
         </Togglable>
-        {blogs.map(blog =>
+        {blogs
+          .sort((a, b) => b.likes - a.likes)
+          .map(blog =>
           <Blog key={blog.id} blog={blog} user={user} updateLikes={updateLikes}/>
         )}
       </div>
