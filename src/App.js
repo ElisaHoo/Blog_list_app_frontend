@@ -93,12 +93,17 @@ const App = () => {
   // A reference to the component Togglable to access its "ToggleVisibility"
   const blogFormRef = useRef()
 
+  const updateLikes = async (blogId, updatedBlog) => {
+    await blogService.likes(blogId, updatedBlog)
+    await blogService.getAll().then(blogs => setBlogs(blogs))
+  }
+
   return (
     <div>
       { <ErrorNotification message={errorMessage} /> }
       { <Notification message={notificationMessage} /> }
 
-      {!user && loginForm()}  {/* if user is not defined blogForm is not displayed */}
+      {!user && loginForm()}  {/* if user is not defined, blogForm is not displayed */}
       {user && <div>
         <form onSubmit={handleLogout}>
           <p>{user.name} logged in
@@ -109,7 +114,7 @@ const App = () => {
           <BlogForm createBlog={addBlog}/>
         </Togglable>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} user={user}/>
+          <Blog key={blog.id} blog={blog} user={user} updateLikes={updateLikes}/>
         )}
       </div>
       }

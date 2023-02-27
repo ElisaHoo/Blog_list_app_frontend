@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const Blog = ({blog, user}) => {
+const Blog = ({blog, user, updateLikes}) => {
   const [visible, setVisible] = useState(false)
 
   const hideWhenVisible = { display: visible ? 'none' : '' }
@@ -8,6 +8,18 @@ const Blog = ({blog, user}) => {
 
   const toggleVisibility = () => {
     setVisible(!visible)
+  }
+
+  const moreLikes = async (event) => {
+    event.preventDefault()
+    const updatedBlog = {
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes + 1,
+      user: blog.user
+    }
+    updateLikes(blog.id, updatedBlog)
   }
 
   const blogStyle = {
@@ -22,10 +34,10 @@ const Blog = ({blog, user}) => {
   if (visible) {
     return (
       <div style={blogStyle} display={showWhenVisible}>
-        <div>{blog.title},{ }{blog.author}{ }<button onClick={toggleVisibility}>Hide</button></div>
+        <div>{blog.title}, author {blog.author}{' '}<button onClick={toggleVisibility}>Hide</button></div>
         <div>{blog.url}</div>
-        <div>likes {blog.likes}<button>Likes</button></div>
-        <div>Created on the list: {user.name}</div>
+        <div>Likes {blog.likes}{' '}<button onClick={moreLikes}>+1</button></div>
+        <div>Added by {user.name}</div>
       </div>  
     )
   } else {
