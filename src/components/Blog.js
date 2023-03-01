@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const Blog = ({blog, user, updateLikes}) => {
+const Blog = ({blog, user, updateLikes, removeBlog}) => {
   const [visible, setVisible] = useState(false)
 
   const hideWhenVisible = { display: visible ? 'none' : '' }
@@ -22,6 +22,11 @@ const Blog = ({blog, user, updateLikes}) => {
     updateLikes(blog.id, updatedBlog)
   }
 
+  const deleteBlog = async (event) => {
+    event.preventDefault()
+    removeBlog(blog.id)
+  }
+
   const blogStyle = {
     padding: 5,
     marginTop: 5,
@@ -32,12 +37,22 @@ const Blog = ({blog, user, updateLikes}) => {
   }
 
   if (visible) {
+    if (blog.user.name === user.name)
+      return (
+        <div style={blogStyle} display={showWhenVisible}>
+          <div>{blog.title}, author {blog.author}{' '}<button onClick={toggleVisibility}>Hide</button></div>
+          <div>{blog.url}</div>
+          <div>Likes {blog.likes}{' '}<button onClick={moreLikes}>+1</button></div>
+          <div>Added by {blog.user.name}</div>
+          <button style={{backgroundColor: "red"}} onClick={deleteBlog}>Delete</button>
+        </div>  
+      )
     return (
       <div style={blogStyle} display={showWhenVisible}>
         <div>{blog.title}, author {blog.author}{' '}<button onClick={toggleVisibility}>Hide</button></div>
         <div>{blog.url}</div>
         <div>Likes {blog.likes}{' '}<button onClick={moreLikes}>+1</button></div>
-        <div>Added by {user.name}</div>
+        <div>Added by {blog.user.name}</div>
       </div>  
     )
   } else {

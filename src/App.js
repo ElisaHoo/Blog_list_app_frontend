@@ -17,9 +17,7 @@ const App = () => {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+    blogService.getAll().then(blogs => setBlogs( blogs ))  
   }, [])
 
   useEffect(() => {
@@ -37,10 +35,10 @@ const App = () => {
     try {
       const user = await loginService.login({ username, password })
       // Login information is saved in the local storage (= db in the browser)
-      window.localStorage.setItem(
-        'loggedBlogappUser', JSON.stringify(user)
-      )
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       
+      blogService.setToken(user.token)
+
       setUser(user)  // includes servers response: token and users information
       setUsername('')
       setPassword('')
@@ -58,17 +56,16 @@ const App = () => {
     setUser(null)
   }
 
-  const addBlog = (blogObject) => {
+  const addBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility()  //form disappears when a new blog is added
-    blogService
-      .create(blogObject)
-      .then(returnedBlog => {
-        setBlogs(blogs.concat(returnedBlog))
-        setNotificationMessage(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`)
-        setTimeout(() => {
-          setNotificationMessage(null)
-        }, 5000)
-      })
+    const returnedBlog = await blogService.create(blogObject)
+    setBlogs(blogs.concat(returnedBlog))
+    setNotificationMessage(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`)
+    setTimeout(() => {
+      setNotificationMessage(null)
+    }, 5000)
+    const b = await blogService.getAll()
+    setBlogs(b)
   }
 
   const loginForm = () => (
@@ -94,9 +91,18 @@ const App = () => {
   const blogFormRef = useRef()
 
   const updateLikes = async (blogId, updatedBlog) => {
-    await blogService.likes(blogId, updatedBlog)
-    const blogs = await blogService.getAll()
-    setBlogs(blogs)
+    const theBlog = blogs.find(blog => blog.id === blogId)  
+    const returnedBlog = await blogService.likes(blogId, updatedBlog)
+    setBlogs(blogs.map(blog => blog.id !== blogId ? blog : { ...returnedBlog, user: theBlog.user }))
+  }
+
+  const removeBlog = async (blogId) => {
+    const theBlog = blogs.find(blog => blog.id === blogId)
+    const c = window.confirm(`Do you really want to delete the blog "${theBlog.title}" from the list?`)
+    if (c) {
+      await blogService.remove(blogId)
+      setBlogs(blogs.filter(blog => blog.id !== blogId))
+    }
   }
 
   return (
@@ -117,7 +123,7 @@ const App = () => {
         {blogs
           .sort((a, b) => b.likes - a.likes)
           .map(blog =>
-          <Blog key={blog.id} blog={blog} user={user} updateLikes={updateLikes}/>
+          <Blog key={blog.id} blog={blog} user={user} updateLikes={updateLikes} removeBlog={removeBlog}/>
         )}
       </div>
       }
