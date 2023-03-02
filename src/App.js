@@ -4,6 +4,7 @@ import ErrorNotification from './components/ErrorNotification'
 import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import LoginForm from './components/LoginForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './index.css'
@@ -17,7 +18,7 @@ const App = () => {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    blogService.getAll().then(blogs => setBlogs( blogs ))  
+    blogService.getAll().then(blogs => setBlogs( blogs ))
   }, [])
 
   useEffect(() => {
@@ -31,12 +32,12 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({ username, password })
       // Login information is saved in the local storage (= db in the browser)
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      
+
       blogService.setToken(user.token)
 
       setUser(user)  // includes servers response: token and users information
@@ -68,30 +69,11 @@ const App = () => {
     setBlogs(b)
   }
 
-  const loginForm = () => (
-    <div>
-        <h2>Log in to application</h2>
-        <form onSubmit={handleLogin}>
-          <div>
-            username
-              <input type="text" value={username} name="Username" 
-              onChange={({ target }) => setUsername(target.value)}/>
-          </div>
-          <div>
-            password
-              <input type="password" value={password} name="Password"
-              onChange={({ target }) => setPassword(target.value)}/>
-          </div>
-          <button type="submit">login</button>
-        </form>
-      </div>
-  )
-
   // A reference to the component Togglable to access its "ToggleVisibility"
   const blogFormRef = useRef()
 
   const updateLikes = async (blogId, updatedBlog) => {
-    const theBlog = blogs.find(blog => blog.id === blogId)  
+    const theBlog = blogs.find(blog => blog.id === blogId)
     const returnedBlog = await blogService.likes(blogId, updatedBlog)
     setBlogs(blogs.map(blog => blog.id !== blogId ? blog : { ...returnedBlog, user: theBlog.user }))
   }
@@ -110,21 +92,33 @@ const App = () => {
       { <ErrorNotification message={errorMessage} /> }
       { <Notification message={notificationMessage} /> }
 
-      {!user && loginForm()}  {/* if user is not defined, blogForm is not displayed */}
+      {/* if user is not defined, blogForm is not displayed */}
+      {!user &&
+        <Togglable buttonLabel="Log in">
+          <LoginForm
+            username={username}
+            password={password}
+            handleLogin={handleLogin}
+            setUsername={setUsername}
+            setPassword={setPassword}
+          />
+        </Togglable>
+      }
       {user && <div>
         <form onSubmit={handleLogout}>
           <p>{user.name} logged in
-          <button type='submit' style={{'marginLeft': 8}}>Logout</button>
+            <button type='submit' style={{ 'marginLeft': 8 }}>Logout</button>
           </p>
         </form>
-        <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
+        <Togglable buttonLabel="Add a new blog" ref={blogFormRef}>
           <BlogForm createBlog={addBlog}/>
         </Togglable>
+        <h2>Blogs</h2>
         {blogs
           .sort((a, b) => b.likes - a.likes)
           .map(blog =>
-          <Blog key={blog.id} blog={blog} user={user} updateLikes={updateLikes} removeBlog={removeBlog}/>
-        )}
+            <Blog key={blog.id} blog={blog} user={user} updateLikes={updateLikes} removeBlog={removeBlog}/>
+          )}
       </div>
       }
     </div>

@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useState } from 'react'
 
-const Blog = ({blog, user, updateLikes, removeBlog}) => {
+const Blog = ({ blog, user, updateLikes, removeBlog }) => {
   const [visible, setVisible] = useState(false)
 
   const hideWhenVisible = { display: visible ? 'none' : '' }
@@ -40,26 +40,26 @@ const Blog = ({blog, user, updateLikes, removeBlog}) => {
     if (blog.user.name === user.name)
       return (
         <div style={blogStyle} display={showWhenVisible}>
-          <div>{blog.title}, author {blog.author}{' '}<button onClick={toggleVisibility}>Hide</button></div>
+          <div>{blog.title}, author {blog.author} <button onClick={toggleVisibility}>Hide</button></div>
           <div>{blog.url}</div>
-          <div>Likes {blog.likes}{' '}<button onClick={moreLikes}>+1</button></div>
+          <div>Likes {blog.likes} <button onClick={moreLikes}>+1</button></div>
           <div>Added by {blog.user.name}</div>
-          <button style={{backgroundColor: "red"}} onClick={deleteBlog}>Delete</button>
-        </div>  
+          <button style={{ backgroundColor: 'red' }} onClick={deleteBlog}>Delete</button>
+        </div>
       )
     return (
       <div style={blogStyle} display={showWhenVisible}>
-        <div>{blog.title}, author {blog.author}{' '}<button onClick={toggleVisibility}>Hide</button></div>
+        <div>{blog.title}, author {blog.author} <button onClick={toggleVisibility}>Hide</button></div>
         <div>{blog.url}</div>
-        <div>Likes {blog.likes}{' '}<button onClick={moreLikes}>+1</button></div>
+        <div>Likes {blog.likes} <button onClick={moreLikes}>+1</button></div>
         <div>Added by {blog.user.name}</div>
-      </div>  
+      </div>
     )
   } else {
     return(
       <div style={blogStyle} display={hideWhenVisible}>
-        {blog.title},{ }{blog.author}{ }<button onClick={toggleVisibility}>View</button>
-    </div>
+        {blog.title}, {blog.author} <button onClick={toggleVisibility}>View</button>
+      </div>
     )
   }
 }
