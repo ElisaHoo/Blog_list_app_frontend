@@ -37,28 +37,22 @@ const Blog = ({ blog, user, updateLikes, removeBlog }) => {
   }
 
   if (visible) {
-    if (blog.user.name === user.name)
-      return (
-        <div style={blogStyle} display={showWhenVisible}>
-          <div>{blog.title}, author {blog.author} <button onClick={toggleVisibility}>Hide</button></div>
-          <div>{blog.url}</div>
-          <div>Likes {blog.likes} <button onClick={moreLikes}>+1</button></div>
-          <div>Added by {blog.user.name}</div>
-          <button style={{ backgroundColor: 'red' }} onClick={deleteBlog}>Delete</button>
-        </div>
-      )
     return (
-      <div style={blogStyle} display={showWhenVisible}>
-        <div>{blog.title}, author {blog.author} <button onClick={toggleVisibility}>Hide</button></div>
+      <div style={blogStyle} className='blog_all' display={showWhenVisible}>
+        <div>{blog.title}, author {blog.author} <button onClick={toggleVisibility} id='hide-button'>Hide</button></div>
         <div>{blog.url}</div>
-        <div>Likes {blog.likes} <button onClick={moreLikes}>+1</button></div>
+        <div>Likes {blog.likes} <button onClick={moreLikes} id='like-button'>+1</button></div>
         <div>Added by {blog.user.name}</div>
+        {blog.user.name === user.name
+          ? <button style={{ backgroundColor: 'red' }} onClick={deleteBlog} id='delete-button'>Delete</button>
+          : null
+        }
       </div>
     )
   } else {
     return(
-      <div style={blogStyle} display={hideWhenVisible}>
-        {blog.title}, {blog.author} <button onClick={toggleVisibility}>View</button>
+      <div style={blogStyle} className='blog_part' display={hideWhenVisible}>
+        {blog.title}, {blog.author} <button onClick={toggleVisibility} id='view-button'>View</button>
       </div>
     )
   }
